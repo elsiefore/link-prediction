@@ -1,4 +1,7 @@
 from pyspark import SparkConf, SparkContext
+from pyspark.ml.recommendation import ALS
+from pyspark.sql.types import StructType, StructField, IntegerType
+from pyspark.sql.functions import lit
 import re
 import math
 
@@ -30,8 +33,8 @@ def getDataframeForALS(rdd):
     schema = StructType([
         StructField("user", IntegerType(), True),
         StructField("item", IntegerType(), True)])
-    df = sqlContext.createDataFrame(rdd_new, schema)
-    df = df.withColumn("rating", F.lit(1))
+    df = sc.createDataFrame(rdd_new, schema)
+    df = df.withColumn("rating", lit(1))
     return df
 
 # initialize spark
@@ -44,8 +47,8 @@ pruned_data = pruneData(raw, 4)
 (train_rdd, test_rdd) = trainTestSplit(pruned_data)
 
 
-train_df = getDataframeForALS(train_rdd)
-test_df = getDataframeForALS(test_rdd)
+train_df = getDataframeForALS(train_rdd, sc)
+test_df = getDataframeForALS(test_rdd, sc)
 
 als = ALS(rank=15, maxIter=10, regParam=0.01, userCol="user", itemCol="item", ratingCol='rating',
           coldStartStrategy="drop")

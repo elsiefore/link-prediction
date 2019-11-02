@@ -7,6 +7,7 @@ from pyspark.ml.evaluation import RegressionEvaluator
 
 import re
 import math
+# import pandas as pd
 
 
 # user defined functions
@@ -47,23 +48,6 @@ sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
 # read raw data
-raw = sc.textFile("data/sample.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
+raw = sc.textFile("data/links.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
 pruned_data = pruneData(raw, 4)
 (train_rdd, test_rdd) = trainTestSplit(pruned_data)
-
-
-train_df = getDataframeForALS(train_rdd, sqlContext)
-test_df = getDataframeForALS(test_rdd, sqlContext)
-
-als = ALS(rank=15, maxIter=10, regParam=0.01, userCol="user", itemCol="item", ratingCol='rating',
-          coldStartStrategy="drop")
-als_model = als.fit(train_df)
-
-# evaluate the performance of ALS
-als_predictions = als_model.transform(test_df)
-als_evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
-                                predictionCol="prediction")
-als_auc = als_evaluator.evaluate(als_predictions)
-print("Root-mean-square error = " + str(als_auc))
-# Top 10 recommendations per user
-userRecs = als_model.recommendForAllUsers(10) 

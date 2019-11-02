@@ -49,7 +49,7 @@ sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
 # read raw data
-raw = sc.textFile("data/links.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
+raw = sc.textFile("data/10m.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
 pruned_data = pruneData(raw, 4)
 (train_rdd, test_rdd) = trainTestSplit(pruned_data)
 
@@ -90,6 +90,13 @@ def get_k_accuracy(row, k):
             result.append((i, len([x for x in predictions[:i] if x in actuals])) / i)
     return result
 
+als_recs = als_model.recommendForAllUsers(10).collect()
+
+# output als results
+with open("results/als_10m_results.txt", 'w') as f:
+    for result in als_recs:
+        f.write(str(bytes("{}: {}".format(str(result.user), str(result.recommendations)), encoding='utf-8')))
+        f.write("\n")
 
 accuracy_result = validation_rdd.flatMap(lambda l : get_k_accuracy(l, k)) \
     .mapValues(lambda v: (v, 1)) \

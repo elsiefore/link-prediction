@@ -31,7 +31,7 @@ def mapLineToUserPairs(line):
     pairs = re.split(' ', line)
     return (pairs[0], pairs[1])
 
-raw = sc.textFile("sample.txt").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
+raw = sc.textFile("data/links.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
 pruned_data = pruneData(raw, 4)
 (train_rdd, test_rdd) = trainTestSplit(pruned_data)
 

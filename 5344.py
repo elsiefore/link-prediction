@@ -28,6 +28,44 @@ def trainTestSplit(rdd, ratio = 0.6):
     test_rdd = split_rdd.map(lambda l: (l[0], l[2]))
     return (train_rdd, test_rdd)
 
+<<<<<<< HEAD
+# read raw data
+def mapLineToUserPairs(line):
+    pairs = re.split(' ', line)
+    return (pairs[0], pairs[1])
+
+# 
+def getDataframeForALS(rdd):
+    rdd_new = rdd.flatMapValues(lambda x: x).map(lambda row: [int(x) for x in row])
+    schema = StructType([
+        StructField("user", IntegerType(), True),
+        StructField("item", IntegerType(), True)])
+    df = sqlContext.createDataFrame(rdd_new, schema)
+    df = df.withColumn("rating", F.lit(1))
+    return df
+
+
+
+# initialize spark
+conf = SparkConf()
+sc = SparkContext(conf=conf)
+
+
+raw = sc.textFile("sample.txt").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
+pruned_data = pruneData(raw, 4)
+(train_rdd, test_rdd) = trainTestSplit(pruned_data)
+
+train_df = getDataframeForALS(train_rdd)
+test_df = getDataframeForALS(test_rdd)
+
+als = ALS(rank=15, maxIter=10, regParam=0.01, userCol="user", itemCol="item", ratingCol='rating',
+          coldStartStrategy="drop")
+als_model = als.fit(train_df)
+# Top 10 recommendations per user
+userRecs = als_model.recommendForAllUsers(10) 
+
+
+=======
 def mapLineToUserPairs(line):
     pairs = re.split(' ', line)
     return (pairs[0], pairs[1])
@@ -51,3 +89,4 @@ sqlContext = SQLContext(sc)
 raw = sc.textFile("data/links.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
 pruned_data = pruneData(raw, 4)
 (train_rdd, test_rdd) = trainTestSplit(pruned_data)
+>>>>>>> 02ff1797ee91e561b0a1445d9bbfcd4fa1ab0a13

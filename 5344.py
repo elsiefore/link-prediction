@@ -1,6 +1,13 @@
 from pyspark import SparkConf, SparkContext
+from pyspark.sql import SQLContext
+from pyspark.ml.recommendation import ALS
+from pyspark.sql.types import StructType, StructField, IntegerType
+from pyspark.sql.functions import lit
+from pyspark.ml.evaluation import RegressionEvaluator
+
 import re
 import math
+# import pandas as pd
 
 
 # user defined functions
@@ -21,6 +28,7 @@ def trainTestSplit(rdd, ratio = 0.6):
     test_rdd = split_rdd.map(lambda l: (l[0], l[2]))
     return (train_rdd, test_rdd)
 
+<<<<<<< HEAD
 # read raw data
 def mapLineToUserPairs(line):
     pairs = re.split(' ', line)
@@ -57,3 +65,28 @@ als_model = als.fit(train_df)
 userRecs = als_model.recommendForAllUsers(10) 
 
 
+=======
+def mapLineToUserPairs(line):
+    pairs = re.split(' ', line)
+    return (pairs[0], pairs[1])
+
+def getDataframeForALS(rdd, sc):
+    rdd_new = rdd.flatMapValues(lambda x: x).map(lambda row: [int(x) for x in row])
+    schema = StructType([
+        StructField("user", IntegerType(), True),
+        StructField("item", IntegerType(), True)])
+    df = sc.createDataFrame(rdd_new, schema)
+    df = df.withColumn("rating", lit(1))
+    return df
+
+
+# initialize spark
+conf = SparkConf()
+sc = SparkContext(conf=conf)
+sqlContext = SQLContext(sc)
+
+# read raw data
+raw = sc.textFile("data/links.csv").filter(lambda l: l).map(lambda l: mapLineToUserPairs(l))
+pruned_data = pruneData(raw, 4)
+(train_rdd, test_rdd) = trainTestSplit(pruned_data)
+>>>>>>> 02ff1797ee91e561b0a1445d9bbfcd4fa1ab0a13

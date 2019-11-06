@@ -1,7 +1,7 @@
 # link-prediction
 Assignment Repo
 
-# Instructions
+**Instructions**
 - Use data/twitter_links_pruned_3M.csv as the main data source. This data is from Twitter 2010, and pruned by:
 	- First 3 millions edges
 	- Source nodes with degrees (in and out) between 10 and 500

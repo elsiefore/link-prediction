@@ -105,3 +105,6 @@ venv.bak/
 
 # data files
 links-anon.txt
+archives/
+temp/
+*/.DS_Store

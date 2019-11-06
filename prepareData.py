@@ -62,4 +62,4 @@ if __name__ == '__main__':
 
 	main(args)
 
-	# spark-submit prepareData.py --input ~/Downloads/twitter_links.csv --output test --nrows 100 --minOutDegrees 1
+	# spark-submit prepareData.py --input data/twitter_links_pruned_3M.csv --output twitter_links_pruned_3M --nrows 10000000 --minOutDegrees 1

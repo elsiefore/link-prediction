@@ -35,6 +35,8 @@ def main(args):
 	bagged_df = bagged_rdd.toDF(["bag_id", "src", "dst"])
 	bagged_df.write.partitionBy("bag_id").option("sep", args.delimiter).csv('temp/' + args.output)
 
+	sc.stop()
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--input')

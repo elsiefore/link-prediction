@@ -1,1 +1,0 @@
-spark-submit --class au.csiro.data61.randomwalk.Main stellar-random-walk/randomwalk/target/randomwalk-0.0.1-SNAPSHOT.jar --cmd randomwalk --numWalks 5 --p 1 --q 1 --walkLength 20 --rddPartitions 10 --input data/train_links_3M --output data/train_bagging_out --directed true
